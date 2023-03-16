@@ -16,6 +16,8 @@ const minutesRef = document.querySelector('[data-minutes]');
 const secondsRef = document.querySelector('[data-seconds]');
 
 startBtn.disabled = true;
+startBtn.addEventListener('click', setTimer);
+
 const options = {
   enableTime: true,
   time_24hr: true,
@@ -29,43 +31,42 @@ const options = {
         'Okay'
       );
     } else {
-      Report.success('Congratulation!', 'Click on start!', 'Okay');
+      selectedDate = selectedDates[0].getTime();
       startBtn.disabled = false;
-      const setTimer = () => {
-        selectedDate = selectedDates[0].getTime();
-        timerStart();
-      };
-      startBtn.addEventListener('click', setTimer);
+      Report.success('Congratulation!', 'Click on start!', 'Okay');
     }
   },
 };
+
 const fp = flatpickr(flatpickrInput, options);
 
-function timerStart() {
-  const intervalID = setInterval(() => {
-    currentDate = Date.now();
-    const deltaTime = selectedDate - currentDate;
+function setTimer() {
+  counter.start();
+}
+
+const counter = {
+  start() {
+    intervalID = setInterval(() => {
+      currentDate = Date.now();
+      const deltaTime = selectedDate - currentDate;
+      updateTimerface(convertMs(deltaTime));
+      startBtn.disabled = true;
+      if (deltaTime <= 0) {
+        this.stop();
+        Report.info(
+          'Timer stopped!',
+          'Please, if you want to start timer, choose a date and click on start or reload this page',
+          'Okay'
+        );
+      }
+    }, TIMER_DELAY);
+  },
+  stop() {
     startBtn.disabled = true;
-    if (deltaTime <= 0) {
-      timerStop();
-      return;
-    }
-    const { days, hours, minutes, seconds } = convertMs(deltaTime);
-    daysRef.textContent = days;
-    hoursRef.textContent = hours;
-    minutesRef.textContent = minutes;
-    secondsRef.textContent = seconds;
-  }, TIMER_DELAY);
-}
-
-function timerStop() {
-  clearInterval(intervalID);
-  startBtn.disabled = true;
-}
-function addLeadingZero(value) {
-  return String(value).padStart(2, '0');
-}
-
+    clearInterval(intervalID);
+    return;
+  },
+};
 function convertMs(ms) {
   const second = 1000;
   const minute = second * 60;
@@ -79,4 +80,13 @@ function convertMs(ms) {
     Math.floor((((ms % day) % hour) % minute) / second)
   );
   return { days, hours, minutes, seconds };
+}
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
+}
+function updateTimerface({ days, hours, minutes, seconds }) {
+  daysRef.textContent = `${days}`;
+  hoursRef.textContent = `${hours}`;
+  minutesRef.textContent = `${minutes}`;
+  secondsRef.textContent = `${seconds}`;
 }
