@@ -51,7 +51,7 @@ const counter = {
       const deltaTime = selectedDate - currentDate;
       updateTimerface(convertMs(deltaTime));
       startBtn.disabled = true;
-      if (deltaTime <= 0) {
+      if (deltaTime <= 1000) {
         this.stop();
         Report.info(
           'Timer stopped!',

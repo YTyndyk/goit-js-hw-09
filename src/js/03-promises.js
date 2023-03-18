@@ -30,6 +30,10 @@ function onPromiseCreate(evt) {
   for (let i = 1; i <= amount; i += 1) {
     let promiseDelay = delay + step * i;
 
+    if (amount <= 0 || step < 0 || delay < 0) {
+      Notify.warning('Data is invalid!');
+      break;
+    }
     createPromise(i, promiseDelay)
       .then(({ position, delay }) => {
         Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
