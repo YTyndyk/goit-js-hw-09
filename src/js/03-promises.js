@@ -27,19 +27,19 @@ function onPromiseCreate(evt) {
   let step = Number(refs.step.value);
   let amount = Number(refs.amount.value);
 
-  for (let i = 1; i <= amount; i += 1) {
-    let promiseDelay = delay + step * i;
+  if (amount <= 0 || step < 0 || delay < 0) {
+    Notify.warning('Data is invalid! Please enter a positive number!');
+  } else {
+    for (let i = 1; i <= amount; i += 1) {
+      let promiseDelay = delay + step * i;
 
-    if (amount <= 0 || step < 0 || delay < 0) {
-      Notify.warning('Data is invalid!');
-      break;
+      createPromise(i, promiseDelay)
+        .then(({ position, delay }) => {
+          Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
+        })
+        .catch(({ position, delay }) => {
+          Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
+        });
     }
-    createPromise(i, promiseDelay)
-      .then(({ position, delay }) => {
-        Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
-      })
-      .catch(({ position, delay }) => {
-        Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
-      });
   }
 }
